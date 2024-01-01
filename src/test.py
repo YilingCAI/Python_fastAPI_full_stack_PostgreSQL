@@ -13,6 +13,10 @@ pip install fastapi
 pip install "unicorn[standard]"
 pip list
 pip freeze > requirements.txt
+git init
+git push --force-with-lease
+git pull
+git remote add projet
 """
 import random
 
@@ -194,58 +198,58 @@ from grades import print_my_name
 # print(random.randint(2, 7))
 
 # OOP
-class Student:
-    number_of_students = 0
-    school = 'Online School'
-    def __init__(self, first_name, last_name, major):
-        self.first_name = first_name
-        self.last_name = last_name
-        self.major = major
-
-        Student.number_of_students +=1
-
-    def fullname_with_major(self):
-        return f'{self.first_name} {self.last_name} is a ' \
-               f'{self.major} major!'
-
-    def full_name_school(self):
-        return f'{self.first_name} {self.last_name} is a ' \
-               f'going to {self.school}'
-
-    @classmethod
-    def set_online_school(cls, new_school):
-        cls.school = new_school
-
-    @classmethod
-    def split_student(cls, student_str):
-        firstname, lastname, major = student_str.split('.')
-        return cls(firstname, lastname, major)
-
-print(Student.number_of_students)
-student_1 = Student('Eric', 'Roby', 'CS')  # une instance de Class student
-student_2 = Student('John', 'Miller', 'Math')
-print(Student.number_of_students)
-print(student_1.first_name)
-print(student_2.first_name)
-
-
-print(student_1.full_name_school())
-
-print(student_1.fullname_with_major())  # more popular in this way
-print(Student.fullname_with_major(student_2))
-
-Student.set_online_school('Pioupiou school')
-print(student_1.school)
-print(student_2.school)
-
-new_student = 'yiling.cai.energy'
-student_3 = Student.split_student(new_student)
-print(student_3.fullname_with_major())
-
-class CollegeStudent(Student):
-    def __init__(self, first_name, last_name, major, job):
-        super().__init__(first_name, last_name, major)
-        self.job = job
-
-print (CollegeStudent('yiling', 'mou', 'CS', 'teacher').fullname_with_major())
-print (CollegeStudent('yiling', 'mou', 'CS', 'teacher').job)
+# class Student:
+#     number_of_students = 0
+#     school = 'Online School'
+#     def __init__(self, first_name, last_name, major):
+#         self.first_name = first_name
+#         self.last_name = last_name
+#         self.major = major
+#
+#         Student.number_of_students +=1
+#
+#     def fullname_with_major(self):
+#         return f'{self.first_name} {self.last_name} is a ' \
+#                f'{self.major} major!'
+#
+#     def full_name_school(self):
+#         return f'{self.first_name} {self.last_name} is a ' \
+#                f'going to {self.school}'
+#
+#     @classmethod
+#     def set_online_school(cls, new_school):
+#         cls.school = new_school
+#
+#     @classmethod
+#     def split_student(cls, student_str):
+#         firstname, lastname, major = student_str.split('.')
+#         return cls(firstname, lastname, major)
+#
+# print(Student.number_of_students)
+# student_1 = Student('Eric', 'Roby', 'CS')  # une instance de Class student
+# student_2 = Student('John', 'Miller', 'Math')
+# print(Student.number_of_students)
+# print(student_1.first_name)
+# print(student_2.first_name)
+#
+#
+# print(student_1.full_name_school())
+#
+# print(student_1.fullname_with_major())  # more popular in this way
+# print(Student.fullname_with_major(student_2))
+#
+# Student.set_online_school('Pioupiou school')
+# print(student_1.school)
+# print(student_2.school)
+#
+# new_student = 'yiling.cai.energy'
+# student_3 = Student.split_student(new_student)
+# print(student_3.fullname_with_major())
+#
+# class CollegeStudent(Student):
+#     def __init__(self, first_name, last_name, major, job):
+#         super().__init__(first_name, last_name, major)
+#         self.job = job
+#
+# print (CollegeStudent('yiling', 'mou', 'CS', 'teacher').fullname_with_major())
+# print (CollegeStudent('yiling', 'mou', 'CS', 'teacher').job)
