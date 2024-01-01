@@ -16,7 +16,8 @@ pip freeze > requirements.txt
 git init
 git push --force-with-lease
 git pull
-git remote add projet
+git remote add projet xxxxxxx
+git remote -v 
 """
 import random
 
