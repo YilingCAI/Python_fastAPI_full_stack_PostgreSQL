@@ -3,12 +3,6 @@ from fastapi import FastAPI, Body
 
 # uvicorn books:app --reload
 # uvicorn books:app --reload
-
-<<<<<<< HEAD:BOOK/books.py
-# This is a Test
-=======
-# This is a small Test
->>>>>>> main:books.py
 app = FastAPI()  # uvicorn is the web server for starting an application
 
 BOOKS = [
