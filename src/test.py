@@ -18,6 +18,7 @@ git push --force-with-lease
 git pull
 git remote add projet xxxxxxx
 git remote -v 
+test
 """
 import random
 

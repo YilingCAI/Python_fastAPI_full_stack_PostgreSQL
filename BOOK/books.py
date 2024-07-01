@@ -4,7 +4,11 @@ from fastapi import FastAPI, Body
 # uvicorn books:app --reload
 # uvicorn books:app --reload
 
+<<<<<<< HEAD:BOOK/books.py
+# This is a Test
+=======
 # This is a small Test
+>>>>>>> main:books.py
 app = FastAPI()  # uvicorn is the web server for starting an application
 
 BOOKS = [
@@ -38,7 +42,6 @@ async def read_author_category_by_query_book(book_author: str, category: str):
             book_to_return.append(book)
 
     return book_to_return
-
 
 @app.post("/books/create_books")
 async def create_book(new_book=Body()):
