@@ -99,6 +99,8 @@ async def delete_book(book_id: int = Path(gt=0)):
             break
     if not book_changed:
         raise HTTPException(status_code=404, detail='Item not found')
+    
+    
 def find_book_id(book: Book):
     # if len(BOOKS) > 0:
     #     book.id = BOOKS[-1].id + 1
