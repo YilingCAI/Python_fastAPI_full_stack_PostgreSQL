@@ -11,6 +11,8 @@ pip -V
 pip install pandas
 pip install fastapi
 pip install "unicorn[standard]"
+pip install "passlib[bcrpyt]"
+pip install psycopg2-binary
 pip list
 pip freeze > requirements.txt
 git init
@@ -18,7 +20,29 @@ git push --force-with-lease
 git pull
 git remote add projet xxxxxxx
 git remote -v 
-test
+
+sudo -u postgres psql postgres
+CREATE USER dbuser WITH PASSWORD 'dbuser';
+
+
+
+# https://www.bytebase.com/blog/top-psql-commands-with-examples/
+# https://www.postgresql.org/docs/current/app-psql.html
+# https://docs.postgresql.fr/10/sql-grant.html 
+
+
+
+# sudo apt install pgbadger
+
+# sudo pgbadger -f stderr -v /var/lib/pgsql/16/data/pg_log/postgresql-*.log -o /home/yiling/project/fastAPI/TodoApp/report.html
+modify postgresql.conf  -> restart the service
+
+logging_collector = on
+log_directory = '/var/lib/pgsql/13/data/pg_log'
+log_filename = 'postgresql-%a.log'
+log_rotation_age = 1d
+log_rotation_size = 0
+
 """
 import random
 

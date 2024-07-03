@@ -23,3 +23,31 @@ class Todos(Base):
     priority = Column(String)
     complete = Column(Boolean, default=False)
     owner_id = Column(Integer, ForeignKey("users.id"))
+
+
+
+""" create table Users(
+    id Integer,
+    email varchar(20) UNIQUE, 
+    username varchar(20) UNIQUE, 
+    first_name varchar(20), 
+    last_name varchar(20), 
+    hashed_password varchar(20), 
+    is_active boolean default True, 
+    role varchar(20),
+	PRIMARY KEY(id)
+	);
+
+
+create table Todos(
+    id Integer,
+    title varchar(20), 
+    description varchar(20), 
+    priority integer, 
+    complete varchar(20), 
+    owner_id integer,
+	PRIMARY KEY(id),
+	CONSTRAINT fk_users
+      FOREIGN KEY(owner_id) 
+        REFERENCES users(id)
+	); """
