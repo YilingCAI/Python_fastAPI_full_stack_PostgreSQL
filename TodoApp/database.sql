@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS public.users(
-    id Integer,
+    id SERIAL,
     email varchar(20) UNIQUE, 
     username varchar(20) UNIQUE, 
     first_name varchar(20), 
@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS public.users(
 
 CREATE TABLE IF NOT EXISTS public.todos
 (
-    id integer NOT NULL,
+    id SERIAL,
     title character varying(20) COLLATE pg_catalog."default",
     description character varying(20) COLLATE pg_catalog."default",
     priority integer,
