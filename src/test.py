@@ -13,6 +13,9 @@ pip install fastapi
 pip install "unicorn[standard]"
 pip install "passlib[bcrpyt]"
 pip install psycopg2-binary
+pip install alembic
+alembic init alembic
+pip install pytest
 pip list
 pip freeze > requirements.txt
 git init
