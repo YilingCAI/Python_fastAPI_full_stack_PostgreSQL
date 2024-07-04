@@ -12,6 +12,7 @@ class Users(Base):
     hashed_password = Column(String)
     is_active = Column(Boolean, default = True)
     role = Column(String)
+# phone_number = Column(String)
 
 
 class Todos(Base):
@@ -27,7 +28,7 @@ class Todos(Base):
 
 
 """ create table Users(
-    id Integer,
+    id SERIAL,
     email varchar(20) UNIQUE, 
     username varchar(20) UNIQUE, 
     first_name varchar(20), 
@@ -40,7 +41,7 @@ class Todos(Base):
 
 
 create table Todos(
-    id Integer,
+    id SERIAL,
     title varchar(20), 
     description varchar(20), 
     priority integer, 
