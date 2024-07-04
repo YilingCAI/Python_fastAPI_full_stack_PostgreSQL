@@ -13,8 +13,13 @@ pip install fastapi
 pip install "unicorn[standard]"
 pip install "passlib[bcrpyt]"
 pip install psycopg2-binary
+pip install python-multipart 
+pip install "python-jose[cryptography]"
 pip install alembic
 alembic init alembic
+alembic revision -m "create phone number for users"
+alembic upgrade revisionID
+alembic downgrade -1
 pip install pytest
 pip list
 pip freeze > requirements.txt
