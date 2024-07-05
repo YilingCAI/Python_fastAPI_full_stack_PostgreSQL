@@ -51,6 +51,12 @@ log_filename = 'postgresql-%a.log'
 log_rotation_age = 1d
 log_rotation_size = 0
 
+
+pg_dump -U postgres -d TodoApplicationDatabase > backup.sql
+pg_dump -U postgres -d TodoApplicationDatabase -t public.users > backup_users.sql
+psql -U postgres -d TodoApplicationDatabase -h localhost < backup_users.sql
+
+https://blog.devgenius.io/setup-continuous-archiving-and-point-in-time-recovery-pitr-with-postgresql-db-7e670523e8e4 
 """
 import random
 
