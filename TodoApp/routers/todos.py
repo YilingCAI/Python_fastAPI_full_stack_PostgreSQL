@@ -1,9 +1,8 @@
 from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, Path
 from sqlalchemy.orm import Session
-import models 
-from models import Todos
-from database import SessionLocal
+from ..models import Todos
+from ..database import SessionLocal
 from starlette import status
 from pydantic import BaseModel, Field
 from .auth import get_current_user
@@ -56,7 +55,7 @@ async def create_todo(user: user_dependency, db: db_dependency, todo_request: To
     db.commit()
 
 
-@router.put("/todo", status_code=status.HTTP_204_NO_CONTENT)
+@router.put("/todo/{todo_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def update_todo(user: user_dependency, db: db_dependency, todo_request: TodoRequest, todo_id: int = Path(gt=0)):
     if user is None:
         raise HTTPException(status_code=401, detail="Authentification failed")
