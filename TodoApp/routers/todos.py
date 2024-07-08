@@ -1,87 +1,146 @@
-from typing import Annotated
-from fastapi import APIRouter, Depends, HTTPException, Path
-from sqlalchemy.orm import Session
-import models 
-from models import Todos
-from database import SessionLocal
 from starlette import status
-from pydantic import BaseModel, Field
+from starlette.responses import RedirectResponse
+
+from fastapi import Depends, APIRouter, Request, Form
+from models import Base, Todos
+from database import engine, SessionLocal
+from sqlalchemy.orm import Session
 from .auth import get_current_user
 
-router = APIRouter()
+from fastapi.responses import HTMLResponse
+from fastapi.templating import Jinja2Templates
+
+router = APIRouter(
+    prefix="/todos",
+    tags=["todos"],
+    responses={404: {"description": "Not found"}}
+)
+
+Base.metadata.create_all(bind=engine)
+templates = Jinja2Templates(directory="templates")
+
 
 def get_db():
-    db = SessionLocal()
     try:
+        db = SessionLocal()
         yield db
     finally:
         db.close()
 
 
-db_dependency = Annotated[Session, Depends(get_db)]
-user_dependency = Annotated[dict, Depends(get_current_user)]
+@router.get("/", response_class=HTMLResponse)
+async def read_all_by_user(request: Request, db: Session = Depends(get_db)):
 
-
-class TodoRequest(BaseModel):
-    title: str = Field(min_lenth=3)
-    description: str = Field(min_lenth=3, max_lenth=100)
-    priority: int = Field(gt=0, lt=6)
-    complete: bool
-
-
-@router.get("/")
-async def read_all(user: user_dependency, db: db_dependency):
+    user = await get_current_user(request)
     if user is None:
-        raise HTTPException(status_code=401, detail="Authentification failed")
-    return db.query(Todos).filter(Todos.owner_id == user.get('id')).all()
+        return RedirectResponse(url="/auth", status_code=status.HTTP_302_FOUND)
 
-@router.get("/todo/{todo_id}", status_code=status.HTTP_200_OK)
-async def read_todo(user: user_dependency, db: db_dependency, todo_id: int = Path(gt=0)):
+    todos = db.query(Todos).filter(Todos.owner_id == user.get("id")).all()
+
+    return templates.TemplateResponse("home.html", {"request": request, "todos": todos, "user": user})
+
+
+@router.get("/add-todo", response_class=HTMLResponse)
+async def add_new_todo(request: Request):
+    user = await get_current_user(request)
     if user is None:
-        raise HTTPException(status_code=401, detail="Authentification failed")
+        return RedirectResponse(url="/auth", status_code=status.HTTP_302_FOUND)
 
-    todo_model = db.query(Todos).filter(Todos.id == todo_id).filter(Todos.owner_id == user.get('id')).first()
-    if todo_model is not None:
-        return todo_model
-    raise HTTPException(status_code=404, detail='Todo id not found')
+    return templates.TemplateResponse("add-todo.html", {"request": request, "user": user})
 
 
-@router.post("/todo", status_code=status.HTTP_201_CREATED)
-async def create_todo(user: user_dependency, db: db_dependency, todo_request: TodoRequest):
+@router.post("/add-todo", response_class=HTMLResponse)
+async def create_todo(request: Request, title: str = Form(...), description: str = Form(...),
+                      priority: int = Form(...), db: Session = Depends(get_db)):
+    user = await get_current_user(request)
     if user is None:
-        raise HTTPException(status_code=401, detail="Authentification failed")
-    todo_model = Todos(**todo_request.model_dump(), owner_id=user.get('id'))
+        return RedirectResponse(url="/auth", status_code=status.HTTP_302_FOUND)
+
+    todo_model = Todos()
+    todo_model.title = title
+    todo_model.description = description
+    todo_model.priority = priority
+    todo_model.complete = False
+    todo_model.owner_id = user.get("id")
 
     db.add(todo_model)
     db.commit()
 
+    return RedirectResponse(url="/todos", status_code=status.HTTP_302_FOUND)
 
-@router.put("/todo", status_code=status.HTTP_204_NO_CONTENT)
-async def update_todo(user: user_dependency, db: db_dependency, todo_request: TodoRequest, todo_id: int = Path(gt=0)):
+
+@router.get("/edit-todo/{todo_id}", response_class=HTMLResponse)
+async def edit_todo(request: Request, todo_id: int, db: Session = Depends(get_db)):
+
+    user = await get_current_user(request)
     if user is None:
-        raise HTTPException(status_code=401, detail="Authentification failed")
-    todo_model = db.query(Todos).filter(Todos.id == todo_id).filter(Todos.owner_id == user.get('id')).first()
-    if todo_model is None:
-        raise HTTPException(status_code = 404, detail='todo not found')
-    
-    todo_model.title = todo_request.title
-    todo_model.description = todo_request.description
-    todo_model.priority = todo_request.priority
-    todo_model.complete = todo_request.complete
+        return RedirectResponse(url="/auth", status_code=status.HTTP_302_FOUND)
+
+    todo = db.query(Todos).filter(Todos.id == todo_id).first()
+
+    return templates.TemplateResponse("edit-todo.html", {"request": request, "todo": todo, "user": user})
+
+
+@router.post("/edit-todo/{todo_id}", response_class=HTMLResponse)
+async def edit_todo_commit(request: Request, todo_id: int, title: str = Form(...),
+                           description: str = Form(...), priority: int = Form(...),
+                           db: Session = Depends(get_db)):
+
+    user = await get_current_user(request)
+    if user is None:
+        return RedirectResponse(url="/auth", status_code=status.HTTP_302_FOUND)
+
+    todo_model = db.query(Todos).filter(Todos.id == todo_id).first()
+
+    todo_model.title = title
+    todo_model.description = description
+    todo_model.priority = priority
 
     db.add(todo_model)
     db.commit()
 
+    return RedirectResponse(url="/todos", status_code=status.HTTP_302_FOUND)
 
-@router.delete("/todo/{todo_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_todo(user: user_dependency, db: db_dependency, todo_id: int = Path(gt=0)):
+
+@router.get("/delete/{todo_id}")
+async def delete_todo(request: Request, todo_id: int, db: Session = Depends(get_db)):
+
+    user = await get_current_user(request)
     if user is None:
-        raise HTTPException(status_code=401, detail="Authentification failed")
-    todo_model = db.query(Todos).filter(Todos.id == todo_id).filter(Todos.owner_id == user.get('id')).first()
+        return RedirectResponse(url="/auth", status_code=status.HTTP_302_FOUND)
+
+    todo_model = db.query(Todos).filter(Todos.id == todo_id)\
+        .filter(Todos.owner_id == user.get("id")).first()
+
     if todo_model is None:
-        raise HTTPException(status_code = 404, detail='todo not found')
-     
-    db.query(Todos).filter(Todos.id == todo_id).filter(Todos.owner_id == user.get('id')).delete()
+        return RedirectResponse(url="/todos", status_code=status.HTTP_302_FOUND)
+
+    db.query(Todos).filter(Todos.id == todo_id).delete()
+
     db.commit()
-                      
+
+    return RedirectResponse(url="/todos", status_code=status.HTTP_302_FOUND)
+
+
+@router.get("/complete/{todo_id}", response_class=HTMLResponse)
+async def complete_todo(request: Request, todo_id: int, db: Session = Depends(get_db)):
+
+    user = await get_current_user(request)
+    if user is None:
+        return RedirectResponse(url="/auth", status_code=status.HTTP_302_FOUND)
+
+    todo = db.query(Todos).filter(Todos.id == todo_id).first()
+
+    todo.complete = not todo.complete
+
+    db.add(todo)
+    db.commit()
+
+    return RedirectResponse(url="/todos", status_code=status.HTTP_302_FOUND)
+
+
+
+
+
+
 
